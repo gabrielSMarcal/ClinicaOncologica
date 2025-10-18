@@ -1,6 +1,5 @@
 package com.ClinicaOncologica.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -25,7 +24,6 @@ public class Paciente {
 
     @ManyToOne
     @JoinColumn(name = "medico_id", nullable = false)
-    @JsonManagedReference
     private Medico medico;
 
     // CONSTRUTORES

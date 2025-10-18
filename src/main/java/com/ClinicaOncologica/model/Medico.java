@@ -1,6 +1,5 @@
 package com.ClinicaOncologica.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -21,8 +20,8 @@ public class Medico {
     private Boolean ativo = true;
 
     @OneToMany(mappedBy = "medico", cascade = CascadeType.PERSIST)
-    @JsonBackReference
     private List<Paciente> pacientes = new ArrayList<>();
+
 
     // CONSTRUTORES
     public Medico() {
