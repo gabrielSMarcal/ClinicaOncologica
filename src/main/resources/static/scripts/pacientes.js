@@ -176,6 +176,66 @@ window.deletarPaciente = async function(id) {
     }
 }
 
+// Cadastrar paciente (nova função)
+async function cadastrarPaciente(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const medicoSelect = form.querySelector('select[name="medico"]');
+    
+    if (!medicoSelect) {
+        console.error('Select de médico não encontrado');
+        alert('Erro: campo de médico não encontrado');
+        return;
+    }
+
+    const medicoId = medicoSelect.value;
+    
+    console.log('Médico selecionado:', medicoId); // Debug
+
+    if (!medicoId || medicoId === '') {
+        alert('Por favor, selecione um médico');
+        return;
+    }
+
+    const paciente = {
+        nome: form.querySelector('input[name="nome"]').value,
+        cpf: form.querySelector('input[name="cpf"]').value,
+        dataNascimento: form.querySelector('input[name="dataNascimento"]').value,
+        tipoCancer: form.querySelector('input[name="tipoCancer"]').value,
+        dataInicioTratamento: form.querySelector('input[name="dataInicioTratamento"]').value
+    };
+
+    console.log('Dados do paciente:', paciente); // Debug
+    console.log('URL:', `http://localhost:8081/api/pacientes?medicoId=${medicoId}`); // Debug
+
+    try {
+        const response = await fetch(`http://localhost:8081/api/pacientes?medicoId=${medicoId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(paciente)
+        });
+
+        if (response.ok) {
+            const resultado = await response.json();
+            console.log('Paciente cadastrado:', resultado);
+            alert('Paciente cadastrado com sucesso!');
+            form.reset();
+            carregarPacientes();
+        } else {
+            const errorText = await response.text();
+            console.error('Erro do servidor:', errorText);
+            alert('Erro ao cadastrar paciente: ' + errorText);
+        }
+    } catch (error) {
+        console.error('Erro na requisição:', error);
+        alert('Erro ao cadastrar paciente: ' + error.message);
+    }
+}
+
 // Limpar formulário
 function limparFormulario() {
     document.getElementById('pacienteForm').reset();
