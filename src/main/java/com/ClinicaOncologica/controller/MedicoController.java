@@ -1,15 +1,19 @@
 package com.ClinicaOncologica.controller;
 
 import com.ClinicaOncologica.model.Medico;
+import com.ClinicaOncologica.model.Paciente;
 import com.ClinicaOncologica.service.MedicoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/medicos")
+@CrossOrigin(origins = "*")
 public class MedicoController {
 
     @Autowired
@@ -34,8 +38,13 @@ public class MedicoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Medico> updateMedico(@PathVariable Long id, @RequestBody Medico medicoDetails) {
-        return medicoService.update(id, medicoDetails)
-                .map(ResponseEntity::ok)
+        return medicoService.findById(id)
+                .map(medico -> {
+                    medico.setNome(medicoDetails.getNome());
+                    medico.setCrm(medicoDetails.getCrm());
+                    medico.setAtivo(medicoDetails.getAtivo());
+                    return ResponseEntity.ok(medicoService.save(medico));
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -52,6 +61,7 @@ public class MedicoController {
                 response.put("podeDeletar", false);
                 response.put("pacientes", pacientes);
                 response.put("medicosDisponiveis", medicosDisponiveis);
+                response.put("medicoId", id);
                 
                 return ResponseEntity.ok(response);
             }
@@ -76,7 +86,7 @@ public class MedicoController {
         }
     }
 
-    // DELETAR MÉDICO (APÓS REALOCAÇÃO)
+    // DELETAR MÉDICO (APÓS REALOCAÇÃO/EXCLUSÃO DE TODOS OS PACIENTES)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMedico(@PathVariable Long id) {
         try {

@@ -19,13 +19,13 @@ public class PacienteService {
         return pacienteRepository.findAll();
     }
 
+    public Optional<Paciente> findById(Long id) {
+        return pacienteRepository.findById(id);
+    }
+
     @Transactional
     public Paciente save(Paciente paciente) {
         return pacienteRepository.save(paciente);
-    }
-
-    public Optional<Paciente> findById(Long id) {
-        return pacienteRepository.findById(id);
     }
 
     @Transactional
@@ -39,16 +39,5 @@ public class PacienteService {
         }
         
         pacienteRepository.deleteById(id);
-    }
-
-    public Paciente update(Long id, Paciente pacienteDetails) {
-        Paciente paciente = pacienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Paciente not found"));
-        paciente.setNome(pacienteDetails.getNome());
-        paciente.setCpf(pacienteDetails.getCpf());
-        paciente.setDataNascimento(pacienteDetails.getDataNascimento());
-        paciente.setTipoCancer(pacienteDetails.getTipoCancer());
-        paciente.setDataInicioTratamento(pacienteDetails.getDataInicioTratamento());
-        paciente.setMedico(pacienteDetails.getMedico());
-        return pacienteRepository.save(paciente);
     }
 }

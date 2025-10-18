@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Médicos - Clínica Oncológica</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <h1>🏥 Clínica Oncológica</h1>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="medicos.html" class="active">Médicos</a></li>
+                <li><a href="pacientes.html">Pacientes</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Gestão de Médicos</h2>
+
+        <!-- Formulário de Cadastro/Edição -->
+        <div class="form-container">
+            <h3 id="form-title">Cadastrar Novo Médico</h3>
+            <form id="medico-form">
+                <input type="hidden" id="medico-id">
+                
+                <div class="form-group">
+                    <label for="nome">Nome Completo:</label>
+                    <input type="text" id="nome" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="crm">CRM:</label>
+                    <input type="text" id="crm" required placeholder="Ex: CRM-SP 123456">
+                </div>
+
+                <div class="form-group">
+                    <label for="ativo">Status:</label>
+                    <select id="ativo">
+                        <option value="true">Ativo</option>
+                        <option value="false">Inativo</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Salvar</button>
+                    <button type="button" class="btn-secondary" onclick="cancelarEdicao()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista de Médicos -->
+        <div class="table-container">
+            <h3>Médicos Cadastrados</h3>
+            <table id="medicos-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>CRM</th>
+                        <th>Status</th>
+                        <th>Pacientes</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="medicos-tbody">
+                    <!-- Dados carregados via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Realocação de Pacientes -->
+    <div id="modal-realocacao" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="fecharModal()">&times;</span>
+            <h2>⚠️ Realocação de Pacientes</h2>
+            <p class="modal-warning">Este médico possui pacientes vinculados. Você precisa realocar ou excluir todos os pacientes antes de deletar o médico.</p>
+            
+            <div id="pacientes-realocacao">
+                <!-- Lista de pacientes será carregada aqui -->
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-danger" onclick="confirmarDelecaoMedico()">Confirmar Exclusão do Médico</button>
+                <button class="btn-secondary" onclick="fecharModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/medicos.js"></script>
+</body>
+</html>

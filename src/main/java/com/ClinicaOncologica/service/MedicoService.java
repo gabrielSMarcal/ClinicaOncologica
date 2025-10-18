@@ -27,24 +27,12 @@ public class MedicoService {
         return medicoRepository.findById(id);
     }
 
+    @Transactional
     public Medico save(Medico medico) {
         return medicoRepository.save(medico);
     }
 
-    public void deleteById(Long id) {
-        medicoRepository.deleteById(id);
-    }
-
-    public Medico update(Long id, Medico medicoDetails) {
-        Medico medico = medicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Medico not found with id " + id));
-        medico.setNome(medicoDetails.getNome());
-        medico.setCrm(medicoDetails.getCrm());
-        medico.setAtivo(medicoDetails.getAtivo());
-        return medicoRepository.save(medico);
-    }
-
-    // MÉTODO PARA VERIFICAR SE PODE DELETAR
+    // VERIFICAR SE MÉDICO TEM PACIENTES
     public boolean medicoPossuiPacientes(Long id) {
         Optional<Medico> medicoOpt = medicoRepository.findById(id);
         if (medicoOpt.isEmpty()) {
@@ -53,7 +41,7 @@ public class MedicoService {
         return !medicoOpt.get().podeSerExcluido();
     }
 
-    // MÉTODO PARA OBTER PACIENTES DO MÉDICO
+    // OBTER PACIENTES DO MÉDICO
     public List<Paciente> getPacientesDoMedico(Long medicoId) {
         Optional<Medico> medicoOpt = medicoRepository.findById(medicoId);
         if (medicoOpt.isEmpty()) {
@@ -62,7 +50,7 @@ public class MedicoService {
         return medicoOpt.get().getPacientes();
     }
 
-    // MÉTODO PARA REALOCAR PACIENTE
+    // REALOCAR PACIENTE PARA OUTRO MÉDICO
     @Transactional
     public void realocarPaciente(Long pacienteId, Long novoMedicoId) {
         Paciente paciente = pacienteService.findById(pacienteId)
@@ -79,7 +67,7 @@ public class MedicoService {
         pacienteService.save(paciente);
     }
 
-    // MÉTODO PARA DELETAR MÉDICO (SÓ SE NÃO TIVER PACIENTES)
+    // DELETAR MÉDICO (SÓ SE NÃO TIVER PACIENTES)
     @Transactional
     public void deleteMedico(Long id) {
         Medico medico = medicoRepository.findById(id)
@@ -92,7 +80,7 @@ public class MedicoService {
         medicoRepository.deleteById(id);
     }
 
-    // MÉTODO PARA OBTER MÉDICOS ATIVOS (EXCETO O QUE ESTÁ SENDO DELETADO)
+    // OBTER MÉDICOS ATIVOS (EXCETO O QUE ESTÁ SENDO DELETADO)
     public List<Medico> getMedicosAtivosExceto(Long medicoIdExcluido) {
         return medicoRepository.findAll().stream()
                 .filter(m -> m.getAtivo() && !m.getId().equals(medicoIdExcluido))
