@@ -1,41 +1,38 @@
 package com.ClinicaOncologica.mapper;
 
-import com.ClinicaOncologica.dto.MedicoDTO;
-import com.ClinicaOncologica.dto.PacienteDTO;
-import com.ClinicaOncologica.model.Medico;
+import com.ClinicaOncologica.DTO.*;
 import com.ClinicaOncologica.model.Paciente;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
 public class PacienteMapper {
 
-    public static PacienteDTO toDTO(Paciente paciente) {
+    public PacienteDTO toDTO(Paciente paciente) {
         if (paciente == null) {
             return null;
         }
 
-        MedicoDTO medicoDTO = null;
-        if (paciente.getMedico() != null) {
-            Medico medico = paciente.getMedico();
-            medicoDTO = new MedicoDTO(
-                medico.getId(),
-                medico.getNome(),
-                medico.getCrm(),
-                medico.getAtivo()
-            );
-        }
+        PacienteDTO dto = new PacienteDTO();
+        dto.setId(paciente.getId());
+        dto.setNome(paciente.getNome());
+        dto.setCpf(paciente.getCpf());
+        dto.setDataNascimento(paciente.getDataNascimento());
+        dto.setTipoCancer(paciente.getTipoCancer());
+        dto.setDataInicioTratamento(paciente.getDataInicioTratamento());
+        dto.setMedico(paciente.getMedico() != null ? new MedicoDTO(
+                paciente.getMedico().getId(),
+                paciente.getMedico().getNome(),
+                paciente.getMedico().getCrm(),
+                paciente.getMedico().getAtivo()
+        ) : null);
 
-        return new PacienteDTO(
-            paciente.getId(),
-            paciente.getNome(),
-            paciente.getCpf(),
-            paciente.getDataNascimento(),
-            paciente.getTipoCancer(),
-            paciente.getDataInicioTratamento(),
-            medicoDTO,
-            paciente.getIdade()
-        );
+        return dto;
     }
 
-    public static Paciente toEntity(PacienteDTO dto) {
+    public Paciente toEntity(PacienteDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -49,5 +46,11 @@ public class PacienteMapper {
         paciente.setDataInicioTratamento(dto.getDataInicioTratamento());
 
         return paciente;
+    }
+
+    public List<PacienteDTO> toDTOList(List<Paciente> pacientes) {
+        return pacientes.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 }

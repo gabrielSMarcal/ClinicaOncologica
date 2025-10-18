@@ -1,4 +1,4 @@
-package com.ClinicaOncologica.dto;
+package com.ClinicaOncologica.DTO;
 
 public class MedicoDTO {
     private Long id;

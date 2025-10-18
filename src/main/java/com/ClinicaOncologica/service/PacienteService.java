@@ -1,6 +1,6 @@
 package com.ClinicaOncologica.service;
 
-import com.ClinicaOncologica.dto.PacienteDTO;
+import com.ClinicaOncologica.DTO.PacienteDTO;
 import com.ClinicaOncologica.mapper.PacienteMapper;
 import com.ClinicaOncologica.model.Medico;
 import com.ClinicaOncologica.model.Paciente;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class PacienteService {
@@ -21,46 +21,53 @@ public class PacienteService {
     @Autowired
     private MedicoRepository medicoRepository;
 
+    @Autowired
+    private PacienteMapper pacienteMapper;
+
     public List<PacienteDTO> listarTodos() {
-        return pacienteRepository.findAll()
-            .stream()
-            .map(PacienteMapper::toDTO)
-            .collect(Collectors.toList());
+        List<Paciente> pacientes = pacienteRepository.findAll();
+        return pacienteMapper.toDTOList(pacientes);
     }
 
     public PacienteDTO buscarPorId(Long id) {
         Paciente paciente = pacienteRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
-        return PacienteMapper.toDTO(paciente);
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
+        return pacienteMapper.toDTO(paciente);
     }
 
     public PacienteDTO cadastrar(PacienteDTO dto, Long medicoId) {
+        // Buscar o médico pelo ID
         Medico medico = medicoRepository.findById(medicoId)
-            .orElseThrow(() -> new RuntimeException("Médico não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Médico não encontrado"));
 
-        Paciente paciente = PacienteMapper.toEntity(dto);
+        // Mapear DTO para entidade
+        Paciente paciente = pacienteMapper.toEntity(dto);
+
+        // Vincular o médico ao paciente
         paciente.setMedico(medico);
-        medico.adicionarPaciente(paciente);
 
-        Paciente salvo = pacienteRepository.save(paciente);
-        return PacienteMapper.toDTO(salvo);
+        // Salvar paciente
+        Paciente pacienteSalvo = pacienteRepository.save(paciente);
+
+        return pacienteMapper.toDTO(pacienteSalvo);
     }
 
     public PacienteDTO atualizar(Long id, PacienteDTO dto) {
-        Paciente paciente = pacienteRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
+        Paciente pacienteExistente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
 
-        paciente.setNome(dto.getNome());
-        paciente.setCpf(dto.getCpf());
-        paciente.setDataNascimento(dto.getDataNascimento());
-        paciente.setTipoCancer(dto.getTipoCancer());
-        paciente.setDataInicioTratamento(dto.getDataInicioTratamento());
+        Paciente pacienteAtualizado = pacienteMapper.toEntity(dto);
+        pacienteAtualizado.setId(id);
+        pacienteAtualizado.setMedico(pacienteExistente.getMedico()); // Mantém o médico atual
 
-        Paciente atualizado = pacienteRepository.save(paciente);
-        return PacienteMapper.toDTO(atualizado);
+        Paciente pacienteSalvo = pacienteRepository.save(pacienteAtualizado);
+
+        return pacienteMapper.toDTO(pacienteSalvo);
     }
 
     public void deletar(Long id) {
-        pacienteRepository.deleteById(id);
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
+        pacienteRepository.delete(paciente);
     }
 }

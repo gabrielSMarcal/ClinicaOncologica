@@ -1,5 +1,6 @@
-package com.ClinicaOncologica.dto;
+package com.ClinicaOncologica.DTO;
 
+import com.ClinicaOncologica.DTO.MedicoDTO;
 import java.time.LocalDate;
 
 public class PacienteDTO {
@@ -10,14 +11,12 @@ public class PacienteDTO {
     private String tipoCancer;
     private LocalDate dataInicioTratamento;
     private MedicoDTO medico;
-    private Integer idade;
 
     // CONSTRUTORES
     public PacienteDTO() {}
 
     public PacienteDTO(Long id, String nome, String cpf, LocalDate dataNascimento, 
-                       String tipoCancer, LocalDate dataInicioTratamento, 
-                       MedicoDTO medico, Integer idade) {
+                       String tipoCancer, LocalDate dataInicioTratamento, MedicoDTO medico) {
         this.id = id;
         this.nome = nome;
         this.cpf = cpf;
@@ -25,7 +24,6 @@ public class PacienteDTO {
         this.tipoCancer = tipoCancer;
         this.dataInicioTratamento = dataInicioTratamento;
         this.medico = medico;
-        this.idade = idade;
     }
 
     // GETTERS AND SETTERS
@@ -83,13 +81,5 @@ public class PacienteDTO {
 
     public void setMedico(MedicoDTO medico) {
         this.medico = medico;
-    }
-
-    public Integer getIdade() {
-        return idade;
-    }
-
-    public void setIdade(Integer idade) {
-        this.idade = idade;
     }
 }

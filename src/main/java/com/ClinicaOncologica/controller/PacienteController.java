@@ -1,6 +1,6 @@
 package com.ClinicaOncologica.controller;
 
-import com.ClinicaOncologica.dto.PacienteDTO;
+import com.ClinicaOncologica.DTO.PacienteDTO;
 import com.ClinicaOncologica.service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +27,19 @@ public class PacienteController {
     }
 
     @PostMapping
-    public ResponseEntity<PacienteDTO> cadastrar(@RequestBody PacienteDTO dto, @RequestParam Long medicoId) {
-        return ResponseEntity.ok(pacienteService.cadastrar(dto, medicoId));
+    public ResponseEntity<PacienteDTO> cadastrar(@RequestBody PacienteDTO dto) {
+        // Validar se o médico foi informado no corpo da requisição
+        if (dto.getMedico() == null || dto.getMedico().getId() == null) {
+            throw new IllegalArgumentException("Médico é obrigatório");
+        }
+
+        // Extrair o ID do médico do DTO
+        Long medicoId = dto.getMedico().getId();
+
+        // Chamar o serviço para cadastrar o paciente
+        PacienteDTO resultado = pacienteService.cadastrar(dto, medicoId);
+
+        return ResponseEntity.ok(resultado);
     }
 
     @PutMapping("/{id}")
