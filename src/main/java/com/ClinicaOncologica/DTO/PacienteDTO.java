@@ -1,43 +1,31 @@
-package com.ClinicaOncologica.model;
-
-import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+package com.ClinicaOncologica.dto;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "pacientes")
-public class Paciente {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PacienteDTO {
     private Long id;
-    @Column(nullable = false, length = 100)
     private String nome;
-    @Column(nullable = false, unique = true, length = 14)
     private String cpf;
-    @Column(nullable = false)
     private LocalDate dataNascimento;
-    @Column(nullable = false, length = 100)
     private String tipoCancer;
-    @Column(nullable = false)
     private LocalDate dataInicioTratamento;
-
-    @ManyToOne
-    @JoinColumn(name = "medico_id", nullable = false)
-    @JsonManagedReference
-    private Medico medico;
+    private MedicoDTO medico;
+    private Integer idade;
 
     // CONSTRUTORES
-    public Paciente() {}
+    public PacienteDTO() {}
 
-    public Paciente(String nome, String cpf, LocalDate dataNascimento, String tipoCancer, LocalDate dataInicioTratamento, Medico medico) {
+    public PacienteDTO(Long id, String nome, String cpf, LocalDate dataNascimento, 
+                       String tipoCancer, LocalDate dataInicioTratamento, 
+                       MedicoDTO medico, Integer idade) {
+        this.id = id;
         this.nome = nome;
         this.cpf = cpf;
         this.dataNascimento = dataNascimento;
         this.tipoCancer = tipoCancer;
         this.dataInicioTratamento = dataInicioTratamento;
         this.medico = medico;
+        this.idade = idade;
     }
 
     // GETTERS AND SETTERS
@@ -89,31 +77,19 @@ public class Paciente {
         this.dataInicioTratamento = dataInicioTratamento;
     }
 
-    public Medico getMedico() {
+    public MedicoDTO getMedico() {
         return medico;
     }
 
-    public void setMedico(Medico medico) {
+    public void setMedico(MedicoDTO medico) {
         this.medico = medico;
     }
 
-    // REGRAS DE NEGÓCIO
-    public void transferirParaMedico(Medico novoMedico) {
-        if (novoMedico == null) {
-            throw new IllegalArgumentException("O novo médico não pode ser nulo.");
-        }
-        if (!novoMedico.getAtivo()) {
-            throw new IllegalArgumentException("O novo médico deve estar ativo.");
-        }
-        if (this.medico != null) {
-            this.medico.removerPaciente(this);
-        }
-
-        novoMedico.adicionarPaciente(this);
+    public Integer getIdade() {
+        return idade;
     }
 
-    public int getIdade() {
-        return LocalDate.now().getYear() - this.dataNascimento.getYear();
+    public void setIdade(Integer idade) {
+        this.idade = idade;
     }
-
 }

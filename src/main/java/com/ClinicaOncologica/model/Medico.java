@@ -1,5 +1,6 @@
 package com.ClinicaOncologica.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ public class Medico {
     @Column(nullable = false)
     private Boolean ativo = true;
 
-    @OneToMany(mappedBy = "medico", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "medico")
+    @JsonIgnore
     private List<Paciente> pacientes = new ArrayList<>();
 
 

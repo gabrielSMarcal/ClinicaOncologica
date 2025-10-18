@@ -1,6 +1,6 @@
 package com.ClinicaOncologica.controller;
 
-import com.ClinicaOncologica.model.Paciente;
+import com.ClinicaOncologica.dto.PacienteDTO;
 import com.ClinicaOncologica.service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,45 +10,35 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pacientes")
-@CrossOrigin(origins = "http://127.0.0.1:5500")
+@CrossOrigin(origins = "*")
 public class PacienteController {
 
     @Autowired
     private PacienteService pacienteService;
 
     @GetMapping
-    public List<Paciente> listarTodos() {
-        return pacienteService.listarTodos();
+    public ResponseEntity<List<PacienteDTO>> listarTodos() {
+        return ResponseEntity.ok(pacienteService.listarTodos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> buscarPorId(@PathVariable Long id) {
-        return pacienteService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<PacienteDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(pacienteService.buscarPorId(id));
     }
 
     @PostMapping
-    public Paciente criar(@RequestBody Paciente paciente) {
-        return pacienteService.salvar(paciente);
+    public ResponseEntity<PacienteDTO> cadastrar(@RequestBody PacienteDTO dto, @RequestParam Long medicoId) {
+        return ResponseEntity.ok(pacienteService.cadastrar(dto, medicoId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Paciente> atualizar(@PathVariable Long id, @RequestBody Paciente paciente) {
-        return pacienteService.buscarPorId(id)
-                .map(pacienteExistente -> {
-                    paciente.setId(id);
-                    return ResponseEntity.ok(pacienteService.salvar(paciente));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<PacienteDTO> atualizar(@PathVariable Long id, @RequestBody PacienteDTO dto) {
+        return ResponseEntity.ok(pacienteService.atualizar(id, dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (pacienteService.buscarPorId(id).isPresent()) {
-            pacienteService.deletar(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        pacienteService.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 }
