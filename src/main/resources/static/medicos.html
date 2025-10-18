@@ -37,7 +37,8 @@
                     <input type="text" id="crm" required placeholder="Ex: CRM-SP 123456">
                 </div>
 
-                <div class="form-group">
+                <!-- Campo de status só aparece ao EDITAR -->
+                <div class="form-group" id="status-group" style="display: none;">
                     <label for="ativo">Status:</label>
                     <select id="ativo">
                         <option value="true">Ativo</option>
@@ -91,6 +92,6 @@
         </div>
     </div>
 
-    <script src="js/medicos.js"></script>
+    <script type="module" src="scripts/medicos.js"></script>
 </body>
 </html>

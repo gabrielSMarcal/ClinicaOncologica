@@ -14,7 +14,7 @@ public class Medico {
     private Long id;
     @Column(nullable = false, length = 100)
     private String nome;
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(nullable = false, unique = true, length = 20)
     private String crm;
     @Column(nullable = false)
     private Boolean ativo = true;
@@ -24,11 +24,14 @@ public class Medico {
 
 
     // CONSTRUTORES
-    public Medico() {}
+    public Medico() {
+        this.ativo = true;
+    }
 
     public Medico(String nome, String crm) {
         this.nome = nome;
         this.crm = crm;
+        this.ativo = true;
     }
 
 

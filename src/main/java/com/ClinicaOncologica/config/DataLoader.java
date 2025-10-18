@@ -19,7 +19,7 @@ import java.time.LocalDate;
  *
  * Para desabilitar: comente a annotation @Component
  */
-@Component
+// @Component
 public class DataLoader implements CommandLineRunner {
 
     @Autowired
