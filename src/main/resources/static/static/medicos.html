@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Médicos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Gerenciamento de Médicos</h1>
+    </header>
+    <main>
+        <section id="medicos-list">
+            <h2>Lista de Médicos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>CRM</th>
+                        <th>Ativo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="medicos-table-body">
+                    <!-- Médicos serão carregados aqui -->
+                </tbody>
+            </table>
+        </section>
+        <section id="medico-form">
+            <h2>Cadastrar Novo Médico</h2>
+            <form id="form-medico">
+                <input type="hidden" id="medico-id">
+                <label for="medico-nome">Nome:</label>
+                <input type="text" id="medico-nome" required>
+                <label for="medico-crm">CRM:</label>
+                <input type="text" id="medico-crm" required>
+                <button type="submit">Salvar</button>
+            </form>
+        </section>
+    </main>
+    <script src="js/medicos.js"></script>
+</body>
+</html>

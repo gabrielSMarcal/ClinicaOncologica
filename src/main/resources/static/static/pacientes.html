@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacientes - Clínica Oncológica</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Gerenciamento de Pacientes</h1>
+        <nav>
+            <a href="index.html">Início</a>
+            <a href="medicos.html">Médicos</a>
+            <a href="pacientes.html">Pacientes</a>
+        </nav>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Lista de Pacientes</h2>
+            <table id="pacientesTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Data de Nascimento</th>
+                        <th>Tipo de Câncer</th>
+                        <th>Data de Início do Tratamento</th>
+                        <th>Médico</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Os pacientes serão carregados aqui via JavaScript -->
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Cadastrar Paciente</h2>
+            <form id="pacienteForm">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" required>
+                
+                <label for="cpf">CPF:</label>
+                <input type="text" id="cpf" required>
+                
+                <label for="dataNascimento">Data de Nascimento:</label>
+                <input type="date" id="dataNascimento" required>
+                
+                <label for="tipoCancer">Tipo de Câncer:</label>
+                <input type="text" id="tipoCancer" required>
+                
+                <label for="dataInicioTratamento">Data de Início do Tratamento:</label>
+                <input type="date" id="dataInicioTratamento" required>
+                
+                <label for="medicoId">Médico:</label>
+                <select id="medicoId" required>
+                    <!-- Os médicos serão carregados aqui via JavaScript -->
+                </select>
+                
+                <button type="submit">Cadastrar</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Clínica Oncológica</p>
+    </footer>
+
+    <script src="js/pacientes.js"></script>
+</body>
+</html>
