@@ -160,7 +160,7 @@ async function abrirModalRealocacao(medicoId) {
             div.className = 'paciente-realocacao';
             div.innerHTML = `
                 <div class="paciente-info">
-                    <strong>${paciente.nome}</strong> - CPF: ${paciente.cpf}
+                    <strong>${paciente.nome}</strong> Tipo de Câncer: ${paciente.tipoCancer}
                 </div>
                 <div class="paciente-actions">
                     <select class="select-medico" data-paciente-id="${paciente.id}">
