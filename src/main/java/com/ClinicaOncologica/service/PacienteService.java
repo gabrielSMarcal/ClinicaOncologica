@@ -58,7 +58,7 @@ public class PacienteService {
 
         Paciente pacienteAtualizado = pacienteMapper.toEntity(dto);
         pacienteAtualizado.setId(id);
-        pacienteAtualizado.setMedico(pacienteExistente.getMedico()); // Mantém o médico atual
+        pacienteAtualizado.setMedico(pacienteExistente.getMedico());
 
         Paciente pacienteSalvo = pacienteRepository.save(pacienteAtualizado);
 
@@ -69,5 +69,18 @@ public class PacienteService {
         Paciente paciente = pacienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
         pacienteRepository.delete(paciente);
+    }
+
+    public PacienteDTO realocarMedico(Long pacienteId, Long novoMedicoId) {
+        Paciente paciente = pacienteRepository.findById(pacienteId)
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
+        
+        Medico novoMedico = medicoRepository.findById(novoMedicoId)
+                .orElseThrow(() -> new RuntimeException("Médico não encontrado"));
+        
+        paciente.setMedico(novoMedico);
+        Paciente pacienteSalvo = pacienteRepository.save(paciente);
+        
+        return pacienteMapper.toDTO(pacienteSalvo);
     }
 }

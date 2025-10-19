@@ -52,4 +52,12 @@ public class PacienteController {
         pacienteService.deletar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{pacienteId}/medico/{medicoId}")
+    public ResponseEntity<PacienteDTO> realocarMedico(
+            @PathVariable Long pacienteId,
+            @PathVariable Long medicoId) {
+        PacienteDTO pacienteAtualizado = pacienteService.realocarMedico(pacienteId, medicoId);
+        return ResponseEntity.ok(pacienteAtualizado);
+    }
 }
