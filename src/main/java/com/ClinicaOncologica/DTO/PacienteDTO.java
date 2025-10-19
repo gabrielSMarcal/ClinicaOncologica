@@ -1,6 +1,5 @@
 package com.ClinicaOncologica.DTO;
 
-import com.ClinicaOncologica.DTO.MedicoDTO;
 import java.time.LocalDate;
 
 public class PacienteDTO {

@@ -182,10 +182,10 @@ window.deletarPaciente = async function(id) {
 }
 
 // Limpar formulário
-function limparFormulario() {
+window.limparFormulario = function() {
     document.getElementById('pacienteForm').reset();
     pacienteEmEdicao = null;
-    document.querySelector('#pacienteForm button[type="submit"]').textContent = 'Cadastrar';
+    document.querySelector('#form-title').textContent = 'Cadastrar Novo Paciente';
 }
 
 // Validar CPF (formato básico)
