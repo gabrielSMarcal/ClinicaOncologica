@@ -263,6 +263,14 @@ tbody tr:hover {
     animation: slideDown 0.3s ease-out;
 }
 
+.modal-content h2 {
+    color: #333;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
 .modal-large {
     max-width: 900px;
 }
@@ -351,6 +359,68 @@ tbody tr:hover {
     margin-top: 30px;
     padding-top: 20px;
     border-top: 2px solid #dee2e6;
+}
+
+/* Botões de ação na tabela */
+table button {
+    padding: 8px 16px;
+    margin: 2px 6px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+table button:first-child {
+    background-color: #6B7FED;
+    color: white;
+}
+
+table button:first-child:hover {
+    background-color: #5A6FDC;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(107, 127, 237, 0.3);
+}
+
+table button:last-child {
+    background-color: #6C757D;
+    color: white;
+}
+
+table button:last-child:hover {
+    background-color: #5A6268;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(108, 117, 125, 0.3);
+}
+
+table button:active {
+    transform: translateY(0);
+}
+
+/* Botão de Excluir Paciente */
+button[onclick*="excluirPaciente"] {
+    padding: 8px 16px;
+    margin-left: 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+button[onclick*="excluirPaciente"]:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(220, 53, 69, 0.3);
+}
+
+button[onclick*="excluirPaciente"]:active {
+    transform: translateY(0);
 }
 
 /* Responsividade */
