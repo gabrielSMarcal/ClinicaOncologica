@@ -2,6 +2,7 @@ import { getDados, postDados, putDados, deleteDados } from './api.js';
 
 let medicoEmEdicao = null;
 let medicoParaDeletar = null;
+let pacientesParaRealocar = [];
 
 // Carregar médicos ao iniciar a página
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,7 +33,6 @@ async function renderizarTabelaMedicos(medicos) {
     tbody.innerHTML = '';
     
     for (const medico of medicos) {
-        // Buscar quantidade de pacientes para cada médico
         let qtdPacientes = 0;
         try {
             qtdPacientes = await getDados(`/medicos/${medico.id}/pacientes/count`);
@@ -48,8 +48,8 @@ async function renderizarTabelaMedicos(medicos) {
             <td><span class="status ${medico.ativo ? 'ativo' : 'inativo'}">${medico.ativo ? 'Ativo' : 'Inativo'}</span></td>
             <td>${qtdPacientes}</td>
             <td>
-                <button class="btn-edit" onclick="editarMedico(${medico.id})">Editar</button>
-                <button class="btn-delete" onclick="deletarMedico(${medico.id})">Deletar</button>
+                <button class="btn-edit" onclick="window.editarMedico(${medico.id})">Editar</button>
+                <button class="btn-delete" onclick="window.deletarMedico(${medico.id})">Deletar</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -61,32 +61,22 @@ async function salvarMedico(event) {
     event.preventDefault();
     
     const id = document.getElementById('medico-id').value;
-    const nome = document.getElementById('nome').value;
-    const crm = document.getElementById('crm').value;
-    const ativo = document.getElementById('ativo').value === 'true';
-    
-    const medicoData = {
-        nome: nome.trim(),
-        crm: crm.trim()
+    const medico = {
+        nome: document.getElementById('nome').value,
+        crm: document.getElementById('crm').value,
+        ativo: id ? document.getElementById('ativo').value === 'true' : true
     };
-    
-    // Só inclui ativo se estiver editando
-    if (id) {
-        medicoData.ativo = ativo;
-    }
     
     try {
         if (id) {
-            // Atualizar
-            await putDados(`/medicos/${id}`, medicoData);
+            await putDados(`/medicos/${id}`, medico);
             alert('Médico atualizado com sucesso!');
         } else {
-            // Criar
-            await postDados('/medicos', medicoData);
+            await postDados('/medicos', medico);
             alert('Médico cadastrado com sucesso!');
         }
         
-        limparFormulario();
+        cancelarEdicao();
         carregarMedicos();
     } catch (error) {
         console.error('Erro ao salvar médico:', error);
@@ -95,7 +85,7 @@ async function salvarMedico(event) {
 }
 
 // Editar médico
-window.editarMedico = async function(id) {
+async function editarMedico(id) {
     try {
         const medico = await getDados(`/medicos/${id}`);
         
@@ -104,29 +94,39 @@ window.editarMedico = async function(id) {
         document.getElementById('crm').value = medico.crm;
         document.getElementById('ativo').value = medico.ativo.toString();
         
-        // Mostrar campo de status ao editar
         document.getElementById('status-group').style.display = 'block';
         document.getElementById('form-title').textContent = 'Editar Médico';
         
         medicoEmEdicao = medico;
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
         console.error('Erro ao carregar médico:', error);
         alert('Erro ao carregar médico: ' + error.message);
     }
 }
 
+// Cancelar edição
+function cancelarEdicao() {
+    document.getElementById('medico-form').reset();
+    document.getElementById('medico-id').value = '';
+    document.getElementById('status-group').style.display = 'none';
+    document.getElementById('form-title').textContent = 'Cadastrar Novo Médico';
+    medicoEmEdicao = null;
+}
+
 // Deletar médico
-window.deletarMedico = async function(id) {
+async function deletarMedico(id) {
     try {
-        const medico = await getDados(`/medicos/${id}`);
+        // Verificar se o médico tem pacientes
+        const qtdPacientes = await getDados(`/medicos/${id}/pacientes/count`);
         
-        if (medico.pacientes && medico.pacientes.length > 0) {
-            // Médico tem pacientes, mostrar modal
-            medicoParaDeletar = medico;
-            mostrarModalRealocacao(medico);
+        if (qtdPacientes > 0) {
+            // Se tem pacientes, abrir modal de realocação
+            await abrirModalRealocacao(id);
         } else {
-            // Médico não tem pacientes, pode deletar
-            if (confirm(`Tem certeza que deseja deletar o médico ${medico.nome}?`)) {
+            // Se não tem pacientes, deletar diretamente
+            if (confirm('Tem certeza que deseja deletar este médico?')) {
                 await deleteDados(`/medicos/${id}`);
                 alert('Médico deletado com sucesso!');
                 carregarMedicos();
@@ -138,43 +138,123 @@ window.deletarMedico = async function(id) {
     }
 }
 
-// Mostrar modal de realocação
-function mostrarModalRealocacao(medico) {
-    const modal = document.getElementById('modal-realocacao');
-    const pacientesDiv = document.getElementById('pacientes-realocacao');
-    
-    pacientesDiv.innerHTML = `
-        <h3>Pacientes do Dr(a). ${medico.nome}:</h3>
-        <ul>
-            ${medico.pacientes.map(p => `<li>${p.nome} - CPF: ${p.cpf}</li>`).join('')}
-        </ul>
-        <p class="modal-info">Por favor, realoque ou exclua estes pacientes antes de deletar o médico.</p>
-    `;
-    
-    modal.style.display = 'block';
+// Abrir modal de realocação
+async function abrirModalRealocacao(medicoId) {
+    try {
+        medicoParaDeletar = medicoId;
+        
+        // Buscar pacientes do médico
+        const pacientes = await getDados(`/medicos/${medicoId}/pacientes`);
+        pacientesParaRealocar = pacientes;
+        
+        // Buscar todos os médicos (exceto o atual)
+        const todosMedicos = await getDados('/medicos');
+        const outrosMedicos = todosMedicos.filter(m => m.id !== medicoId && m.ativo);
+        
+        // Renderizar lista de pacientes no modal
+        const container = document.getElementById('pacientes-realocacao');
+        container.innerHTML = '<h3>Pacientes Vinculados:</h3>';
+        
+        pacientes.forEach(paciente => {
+            const div = document.createElement('div');
+            div.className = 'paciente-realocacao';
+            div.innerHTML = `
+                <div class="paciente-info">
+                    <strong>${paciente.nome}</strong> - CPF: ${paciente.cpf}
+                </div>
+                <div class="paciente-actions">
+                    <select class="select-medico" data-paciente-id="${paciente.id}">
+                        <option value="">Selecione um médico</option>
+                        ${outrosMedicos.map(m => `<option value="${m.id}">${m.nome} (${m.crm})</option>`).join('')}
+                    </select>
+                    <button class="btn-danger-small" onclick="window.excluirPaciente(${paciente.id})">Excluir Paciente</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        
+        // Mostrar modal
+        document.getElementById('modal-realocacao').style.display = 'block';
+    } catch (error) {
+        console.error('Erro ao abrir modal:', error);
+        alert('Erro ao carregar pacientes: ' + error.message);
+    }
 }
 
 // Fechar modal
-window.fecharModal = function() {
-    const modal = document.getElementById('modal-realocacao');
-    modal.style.display = 'none';
+function fecharModal() {
+    document.getElementById('modal-realocacao').style.display = 'none';
     medicoParaDeletar = null;
+    pacientesParaRealocar = [];
 }
 
-// Confirmar deleção do médico (após realocação)
-window.confirmarDelecaoMedico = async function() {
-    if (!medicoParaDeletar) return;
+// Excluir paciente
+async function excluirPaciente(pacienteId) {
+    if (!confirm('Tem certeza que deseja excluir este paciente?')) {
+        return;
+    }
     
     try {
-        // Verificar novamente se não há pacientes
-        const medico = await getDados(`/medicos/${medicoParaDeletar.id}`);
+        await deleteDados(`/pacientes/${pacienteId}`);
+        alert('Paciente excluído com sucesso!');
         
-        if (medico.pacientes && medico.pacientes.length > 0) {
-            alert('Ainda há pacientes vinculados a este médico. Realoque-os primeiro.');
-            return;
+        // Atualizar lista de pacientes
+        pacientesParaRealocar = pacientesParaRealocar.filter(p => p.id !== pacienteId);
+        
+        if (pacientesParaRealocar.length === 0) {
+            // Se não há mais pacientes, fechar modal e permitir exclusão do médico
+            fecharModal();
+            await deletarMedicoFinal();
+        } else {
+            // Recarregar modal
+            await abrirModalRealocacao(medicoParaDeletar);
+        }
+    } catch (error) {
+        console.error('Erro ao excluir paciente:', error);
+        alert('Erro ao excluir paciente: ' + error.message);
+    }
+}
+
+// Confirmar exclusão do médico (após realocar/excluir pacientes)
+async function confirmarDelecaoMedico() {
+    try {
+        // Buscar todos os selects de realocação
+        const selects = document.querySelectorAll('.select-medico');
+        const realocacoes = [];
+        
+        // Verificar se todos os pacientes foram realocados ou excluídos
+        for (const select of selects) {
+            const pacienteId = select.getAttribute('data-paciente-id');
+            const novoMedicoId = select.value;
+            
+            if (!novoMedicoId) {
+                alert('Por favor, selecione um médico para todos os pacientes ou exclua-os.');
+                return;
+            }
+            
+            realocacoes.push({ pacienteId, novoMedicoId });
         }
         
-        await deleteDados(`/medicos/${medicoParaDeletar.id}`);
+        // Realizar todas as realocações
+        for (const { pacienteId, novoMedicoId } of realocacoes) {
+            await putDados(`/pacientes/${pacienteId}/medico/${novoMedicoId}`, {});
+        }
+        
+        alert('Pacientes realocados com sucesso!');
+        
+        // Deletar o médico
+        await deletarMedicoFinal();
+        
+    } catch (error) {
+        console.error('Erro ao realocar pacientes:', error);
+        alert('Erro ao realocar pacientes: ' + error.message);
+    }
+}
+
+// Deletar médico (função final)
+async function deletarMedicoFinal() {
+    try {
+        await deleteDados(`/medicos/${medicoParaDeletar}`);
         alert('Médico deletado com sucesso!');
         fecharModal();
         carregarMedicos();
@@ -184,24 +264,10 @@ window.confirmarDelecaoMedico = async function() {
     }
 }
 
-// Cancelar edição
-window.cancelarEdicao = function() {
-    limparFormulario();
-}
-
-// Limpar formulário
-function limparFormulario() {
-    document.getElementById('medico-form').reset();
-    document.getElementById('medico-id').value = '';
-    document.getElementById('status-group').style.display = 'none';
-    document.getElementById('form-title').textContent = 'Cadastrar Novo Médico';
-    medicoEmEdicao = null;
-}
-
-// Fechar modal ao clicar fora
-window.onclick = function(event) {
-    const modal = document.getElementById('modal-realocacao');
-    if (event.target == modal) {
-        fecharModal();
-    }
-}
+// Expor funções globalmente para serem chamadas pelo HTML
+window.editarMedico = editarMedico;
+window.deletarMedico = deletarMedico;
+window.cancelarEdicao = cancelarEdicao;
+window.fecharModal = fecharModal;
+window.excluirPaciente = excluirPaciente;
+window.confirmarDelecaoMedico = confirmarDelecaoMedico;
