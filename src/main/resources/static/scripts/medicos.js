@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function carregarMedicos() {
     try {
         const medicos = await getDados('/medicos');
-        renderizarTabelaMedicos(medicos);
+        await renderizarTabelaMedicos(medicos);
     } catch (error) {
         console.error('Erro ao carregar médicos:', error);
         alert('Erro ao carregar médicos: ' + error.message);
@@ -25,27 +25,35 @@ async function carregarMedicos() {
 }
 
 // Renderizar tabela de médicos
-function renderizarTabelaMedicos(medicos) {
+async function renderizarTabelaMedicos(medicos) {
     const tbody = document.getElementById('medicos-tbody');
     if (!tbody) return;
     
     tbody.innerHTML = '';
     
-    medicos.forEach(medico => {
+    for (const medico of medicos) {
+        // Buscar quantidade de pacientes para cada médico
+        let qtdPacientes = 0;
+        try {
+            qtdPacientes = await getDados(`/medicos/${medico.id}/pacientes/count`);
+        } catch (error) {
+            console.error(`Erro ao contar pacientes do médico ${medico.id}:`, error);
+        }
+        
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${medico.id}</td>
             <td>${medico.nome}</td>
             <td>${medico.crm}</td>
             <td><span class="status ${medico.ativo ? 'ativo' : 'inativo'}">${medico.ativo ? 'Ativo' : 'Inativo'}</span></td>
-            <td>${medico.pacientes ? medico.pacientes.length : 0}</td>
+            <td>${qtdPacientes}</td>
             <td>
                 <button class="btn-edit" onclick="editarMedico(${medico.id})">Editar</button>
                 <button class="btn-delete" onclick="deletarMedico(${medico.id})">Deletar</button>
             </td>
         `;
         tbody.appendChild(tr);
-    });
+    }
 }
 
 // Salvar médico (criar ou atualizar)
