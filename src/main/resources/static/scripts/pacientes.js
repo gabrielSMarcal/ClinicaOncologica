@@ -127,10 +127,10 @@ async function salvarPaciente(event) {
     try {
         if (pacienteEmEdicao) {
             await putDados(`/pacientes/${pacienteEmEdicao}`, pacienteData);
-            alert('Paciente atualizado com sucesso!');
+            mostrarNotificacao('Sucesso', 'Paciente atualizado com sucesso!');
         } else {
             await postDados('/pacientes', pacienteData);
-            alert('Paciente cadastrado com sucesso!');
+            mostrarNotificacao('Sucesso', 'Paciente cadastrado com sucesso!');
         }
         
         limparFormulario();
@@ -172,7 +172,7 @@ window.deletarPaciente = async function(id) {
         
         if (confirm(`Tem certeza que deseja deletar o paciente ${paciente.nome}?`)) {
             await deleteDados(`/pacientes/${id}`);
-            alert('Paciente deletado com sucesso!');
+            mostrarNotificacao('Sucesso', 'Paciente deletado com sucesso!');
             carregarPacientes();
         }
     } catch (error) {
@@ -215,3 +215,26 @@ function formatarData(dataISO) {
         return dataISO;
     }
 }
+
+// Funções mínimas para usar o modal já presente no HTML (duplica aqui para não depender de outro arquivo)
+(function () {
+  function mostrarNotificacao(titulo, mensagem) {
+    const modal = document.getElementById('modal-notificacao');
+    if (!modal) return;
+    const elTitulo = document.getElementById('notificacao-titulo');
+    const elMensagem = document.getElementById('notificacao-mensagem');
+    if (elTitulo) elTitulo.textContent = titulo || 'Informação';
+    if (elMensagem) elMensagem.textContent = mensagem || '';
+    modal.style.display = 'block';
+    const ok = modal.querySelector('.modal-actions button');
+    if (ok) ok.focus();
+  }
+
+  function fecharNotificacao() {
+    const modal = document.getElementById('modal-notificacao');
+    if (modal) modal.style.display = 'none';
+  }
+
+  window.mostrarNotificacao = mostrarNotificacao;
+  window.fecharNotificacao = fecharNotificacao;
+})();

@@ -88,6 +88,20 @@
         </div>
     </div>
 
+    <!-- Modal de Notificação -->
+    <div id="modal-notificacao" class="modal">
+        <div class="modal-content modal-small">
+            <span class="close" onclick="fecharNotificacao()">&times;</span>
+            <div id="notificacao-conteudo">
+                <h2 id="notificacao-titulo"></h2>
+                <p id="notificacao-mensagem"></p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="fecharNotificacao()">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="scripts/pacientes.js"></script>
 </body>
 </html>

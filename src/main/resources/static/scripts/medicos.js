@@ -70,10 +70,12 @@ async function salvarMedico(event) {
     try {
         if (id) {
             await putDados(`/medicos/${id}`, medico);
-            alert('Médico atualizado com sucesso!');
+            // alert('Médico atualizado com sucesso!');
+            mostrarNotificacao('Sucesso', 'Médico atualizado com sucesso!');
         } else {
             await postDados('/medicos', medico);
-            alert('Médico cadastrado com sucesso!');
+            // alert('Médico cadastrado com sucesso!');
+            mostrarNotificacao('Sucesso', 'Médico cadastrado com sucesso!');
         }
         
         cancelarEdicao();
@@ -128,7 +130,8 @@ async function deletarMedico(id) {
             // Se não tem pacientes, deletar diretamente
             if (confirm('Tem certeza que deseja deletar este médico?')) {
                 await deleteDados(`/medicos/${id}`);
-                alert('Médico deletado com sucesso!');
+                // alert('Médico deletado com sucesso!');
+                mostrarNotificacao('Sucesso', 'Médico deletado com sucesso');
                 carregarMedicos();
             }
         }
@@ -196,7 +199,8 @@ async function excluirPaciente(pacienteId) {
     
     try {
         await deleteDados(`/pacientes/${pacienteId}`);
-        alert('Paciente excluído com sucesso!');
+        // alert('Paciente excluído com sucesso!');
+        mostrarNotificacao('Sucesso', 'Paciente excluído com sucesso!');
         
         // Atualizar lista de pacientes
         pacientesParaRealocar = pacientesParaRealocar.filter(p => p.id !== pacienteId);
@@ -240,7 +244,8 @@ async function confirmarDelecaoMedico() {
             await putDados(`/pacientes/${pacienteId}/medico/${novoMedicoId}`, {});
         }
         
-        alert('Pacientes realocados com sucesso!');
+        // alert('Pacientes realocados com sucesso!');
+        mostrarNotificacao('Sucesso', 'Pacientes realocados com sucesso!');
         
         // Deletar o médico
         await deletarMedicoFinal();
@@ -255,7 +260,8 @@ async function confirmarDelecaoMedico() {
 async function deletarMedicoFinal() {
     try {
         await deleteDados(`/medicos/${medicoParaDeletar}`);
-        alert('Médico deletado com sucesso!');
+        // alert('Médico deletado com sucesso!');
+        mostrarNotificacao('Sucesso', 'Médico deletado com sucesso');
         fecharModal();
         carregarMedicos();
     } catch (error) {
@@ -263,6 +269,30 @@ async function deletarMedicoFinal() {
         alert('Erro ao deletar médico: ' + error.message);
     }
 }
+
+// Funções mínimas para usar o modal já presente no HTML
+(function () {
+  function mostrarNotificacao(titulo, mensagem) {
+    const modal = document.getElementById('modal-notificacao');
+    if (!modal) return;
+    const elTitulo = document.getElementById('notificacao-titulo');
+    const elMensagem = document.getElementById('notificacao-mensagem');
+    if (elTitulo) elTitulo.textContent = titulo || 'Informação';
+    if (elMensagem) elMensagem.textContent = mensagem || '';
+    modal.style.display = 'block';
+    const ok = modal.querySelector('.modal-actions button');
+    if (ok) ok.focus();
+  }
+
+  function fecharNotificacao() {
+    const modal = document.getElementById('modal-notificacao');
+    if (modal) modal.style.display = 'none';
+  }
+
+  // expõe globalmente para chamadas inline do HTML (ex: onclick)
+  window.mostrarNotificacao = mostrarNotificacao;
+  window.fecharNotificacao = fecharNotificacao;
+})();
 
 // Expor funções globalmente para serem chamadas pelo HTML
 window.editarMedico = editarMedico;
