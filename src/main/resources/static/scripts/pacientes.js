@@ -165,16 +165,18 @@ window.editarPaciente = async function(id) {
     }
 }
 
-// Deletar paciente
+// Deletar paciente (usar modal de confirmação em vez de confirm())
 window.deletarPaciente = async function(id) {
     try {
         const paciente = await getDados(`/pacientes/${id}`);
         
-        if (confirm(`Tem certeza que deseja deletar o paciente ${paciente.nome}?`)) {
-            await deleteDados(`/pacientes/${id}`);
-            mostrarNotificacao('Sucesso', 'Paciente deletado com sucesso!');
-            carregarPacientes();
-        }
+        // usar o modal de confirmação
+        const confirmado = await confirmarComModal('Tem certeza?', `Tem certeza que deseja deletar o paciente ${paciente.nome}?`);
+        if (!confirmado) return;
+
+        await deleteDados(`/pacientes/${id}`);
+        mostrarNotificacao('Sucesso', 'Paciente deletado com sucesso!');
+        carregarPacientes();
     } catch (error) {
         console.error('Erro ao deletar paciente:', error);
         alert('Erro ao deletar paciente: ' + error.message);
@@ -237,4 +239,65 @@ function formatarData(dataISO) {
 
   window.mostrarNotificacao = mostrarNotificacao;
   window.fecharNotificacao = fecharNotificacao;
+})();
+
+/*
+  Modal de confirmação: confirmarComModal(titulo, mensagem) => Promise<boolean>
+  Usa o markup #modal-confirmacao adicionado no HTML.
+*/
+(function () {
+  let _confirmResolve = null;
+
+  function abrirConfirmacao(titulo, mensagem) {
+    const modal = document.getElementById('modal-confirmacao');
+    if (!modal) return Promise.resolve(false);
+
+    const elTitulo = document.getElementById('confirmacao-titulo');
+    const elMensagem = document.getElementById('confirmacao-mensagem');
+    const btnSim = document.getElementById('confirmacao-sim');
+    const btnNao = document.getElementById('confirmacao-nao');
+    const btnClose = document.getElementById('confirmacao-close');
+
+    if (elTitulo) elTitulo.textContent = titulo || 'Confirmação';
+    if (elMensagem) elMensagem.textContent = mensagem || '';
+
+    modal.style.display = 'block';
+    modal.setAttribute('aria-hidden', 'false');
+
+    const limpar = () => {
+      if (!modal) return;
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      btnSim.removeEventListener('click', onSim);
+      btnNao.removeEventListener('click', onNao);
+      btnClose.removeEventListener('click', onNao);
+      document.removeEventListener('keydown', onEsc);
+    };
+
+    function onSim() {
+      limpar();
+      if (_confirmResolve) _confirmResolve(true);
+      _confirmResolve = null;
+    }
+    function onNao() {
+      limpar();
+      if (_confirmResolve) _confirmResolve(false);
+      _confirmResolve = null;
+    }
+    function onEsc(e) {
+      if (e.key === 'Escape') onNao();
+    }
+
+    btnSim.addEventListener('click', onSim);
+    btnNao.addEventListener('click', onNao);
+    btnClose.addEventListener('click', onNao);
+    document.addEventListener('keydown', onEsc);
+
+    return new Promise((resolve) => {
+      _confirmResolve = resolve;
+    });
+  }
+
+  // expõe função utilitária
+  window.confirmarComModal = abrirConfirmacao;
 })();

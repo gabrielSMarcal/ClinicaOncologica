@@ -70,11 +70,9 @@ async function salvarMedico(event) {
     try {
         if (id) {
             await putDados(`/medicos/${id}`, medico);
-            // alert('Médico atualizado com sucesso!');
             mostrarNotificacao('Sucesso', 'Médico atualizado com sucesso!');
         } else {
             await postDados('/medicos', medico);
-            // alert('Médico cadastrado com sucesso!');
             mostrarNotificacao('Sucesso', 'Médico cadastrado com sucesso!');
         }
         
@@ -127,10 +125,10 @@ async function deletarMedico(id) {
             // Se tem pacientes, abrir modal de realocação
             await abrirModalRealocacao(id);
         } else {
-            // Se não tem pacientes, deletar diretamente
-            if (confirm('Tem certeza que deseja deletar este médico?')) {
+            // Se não tem pacientes, deletar diretamente usando modal de confirmação
+            const confirmado = await confirmarComModal('Tem certeza que deseja deletar este médico?');
+            if (confirmado) {
                 await deleteDados(`/medicos/${id}`);
-                // alert('Médico deletado com sucesso!');
                 mostrarNotificacao('Sucesso', 'Médico deletado com sucesso');
                 carregarMedicos();
             }
@@ -193,13 +191,13 @@ function fecharModal() {
 
 // Excluir paciente
 async function excluirPaciente(pacienteId) {
-    if (!confirm('Tem certeza que deseja excluir este paciente?')) {
+    const confirmado = await confirmarComModal('Tem certeza que deseja excluir este paciente?');
+    if (!confirmado) {
         return;
     }
 
     try {
         await deleteDados(`/pacientes/${pacienteId}`);
-        // alert('Paciente excluído com sucesso!');
         mostrarNotificacao('Sucesso', 'Paciente excluído com sucesso!');
 
         // Atualizar lista de pacientes
@@ -290,6 +288,68 @@ async function deletarMedicoFinal() {
   // expõe globalmente para chamadas inline do HTML (ex: onclick)
   window.mostrarNotificacao = mostrarNotificacao;
   window.fecharNotificacao = fecharNotificacao;
+})();
+
+/*
+  Modal de confirmação: confirmarComModal(mensagem) => Promise<boolean>
+  Usa o markup #modal-confirmacao adicionado no HTML.
+*/
+(function () {
+  let _confirmResolve = null;
+
+  function abrirConfirmacao(titulo, mensagem) {
+    const modal = document.getElementById('modal-confirmacao');
+    if (!modal) return Promise.resolve(false);
+
+    const elTitulo = document.getElementById('confirmacao-titulo');
+    const elMensagem = document.getElementById('confirmacao-mensagem');
+    const btnSim = document.getElementById('confirmacao-sim');
+    const btnNao = document.getElementById('confirmacao-nao');
+    const btnClose = document.getElementById('confirmacao-close');
+
+    if (elTitulo) elTitulo.textContent = titulo || 'Confirmação';
+    if (elMensagem) elMensagem.textContent = mensagem || '';
+
+    modal.style.display = 'block';
+    modal.setAttribute('aria-hidden', 'false');
+
+    // Limpa handlers anteriores
+    const limpar = () => {
+      if (!modal) return;
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      btnSim.removeEventListener('click', onSim);
+      btnNao.removeEventListener('click', onNao);
+      btnClose.removeEventListener('click', onNao);
+      document.removeEventListener('keydown', onEsc);
+    };
+
+    function onSim() {
+      limpar();
+      if (_confirmResolve) _confirmResolve(true);
+      _confirmResolve = null;
+    }
+    function onNao() {
+      limpar();
+      if (_confirmResolve) _confirmResolve(false);
+      _confirmResolve = null;
+    }
+    function onEsc(e) {
+      if (e.key === 'Escape') onNao();
+    }
+
+    btnSim.addEventListener('click', onSim);
+    btnNao.addEventListener('click', onNao);
+    btnClose.addEventListener('click', onNao);
+    document.addEventListener('keydown', onEsc);
+
+    return new Promise((resolve) => {
+      _confirmResolve = resolve;
+    });
+  }
+
+  // expõe função utilitária
+  window.confirmarComModal = abrirConfirmacao;
 })();
 
 // Expor funções globalmente para serem chamadas pelo HTML

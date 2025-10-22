@@ -423,6 +423,67 @@ button[onclick*="excluirPaciente"]:active {
     transform: translateY(0);
 }
 
+/* Ajustes específicos para o modal de confirmação */
+#modal-confirmacao .modal-content {
+    max-width: 520px;
+    padding: 18px 20px; /* mais espaço interno */
+    box-sizing: border-box;
+    text-align: center; /* centraliza título/mensagem */
+}
+
+#modal-confirmacao #confirmacao-titulo {
+    margin: 8px 0 6px; /* espaço acima/abaixo do título */
+    font-size: 20px;
+}
+
+#modal-confirmacao #confirmacao-mensagem {
+    margin: 0 0 14px; /* mensagem mais separada das ações */
+    color: #444;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* Centralizar e espaçar ações, remover borda superior específica */
+#modal-confirmacao .modal-actions {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center; /* centraliza botões */
+    gap: 12px; /* distância entre botões */
+    border-top: none; /* sobrescreve border-top global */
+    padding-top: 0;
+}
+
+/* Remover margens extras dos botões dentro do modal */
+#modal-confirmacao .modal-actions button {
+    margin: 0;
+    padding: 10px 18px;
+}
+
+/* Ajuste para o "close" do modal se necessário (opcional) */
+#modal-confirmacao .close {
+    top: 8px;
+    right: 8px;
+}
+
+/* Centralizar botão OK no modal de notificação */
+#modal-notificacao .modal-content {
+    text-align: center;
+}
+
+#modal-notificacao .modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+    border-top: none;
+    padding-top: 0;
+}
+
+#modal-notificacao .modal-actions button {
+    margin: 0;
+    padding: 10px 18px;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
     .nav-container {
