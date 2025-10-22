@@ -196,18 +196,16 @@ async function excluirPaciente(pacienteId) {
     if (!confirm('Tem certeza que deseja excluir este paciente?')) {
         return;
     }
-    
+
     try {
         await deleteDados(`/pacientes/${pacienteId}`);
         // alert('Paciente excluído com sucesso!');
         mostrarNotificacao('Sucesso', 'Paciente excluído com sucesso!');
-        
+
         // Atualizar lista de pacientes
         pacientesParaRealocar = pacientesParaRealocar.filter(p => p.id !== pacienteId);
-        
+
         if (pacientesParaRealocar.length === 0) {
-            // Se não há mais pacientes, fechar modal e permitir exclusão do médico
-            fecharModal();
             await deletarMedicoFinal();
         } else {
             // Recarregar modal
