@@ -112,8 +112,4 @@ public class Paciente {
         novoMedico.adicionarPaciente(this);
     }
 
-    public int getIdade() {
-        return LocalDate.now().getYear() - this.dataNascimento.getYear();
-    }
-
 }
