@@ -63,6 +63,7 @@ public class MedicoController {
             Medico medico = medicoExistente.get();
             medico.setNome(medicoDTO.getNome());
             medico.setCrm(medicoDTO.getCrm());
+            medico.setAtivo(medicoDTO.getAtivo());
             
             Medico medicoAtualizado = medicoService.salvar(medico);
             return ResponseEntity.ok(medicoAtualizado);
